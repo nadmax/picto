@@ -1,8 +1,6 @@
-// First eight bytes of a PNG file: 137 80 78 71 13 10 26 10
-
 use std::convert::TryFrom;
-use std::str::{from_utf8, FromStr};
 use std::fmt::{self, Display};
+use std::str::{from_utf8, FromStr};
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct ChunkType {
@@ -17,9 +15,7 @@ impl TryFrom<[u8; 4]> for ChunkType {
             return Err("ChunkType only accepts bytes in ASCII table");
         }
 
-        Ok(ChunkType { 
-            bytes: value 
-        })
+        Ok(ChunkType { bytes: value })
     }
 }
 
@@ -31,7 +27,9 @@ impl FromStr for ChunkType {
 
         for b in bytes {
             if !b.is_ascii_alphabetic() {
-                return Err("ChunkType only accepts bytes representing ASCII alphabetic characters");
+                return Err(
+                    "ChunkType only accepts bytes representing ASCII alphabetic characters",
+                );
             }
         }
 
@@ -48,14 +46,14 @@ impl Display for ChunkType {
 }
 
 impl ChunkType {
-    fn bytes(&self) -> [u8; 4] {
+    pub fn bytes(&self) -> [u8; 4] {
         self.bytes
     }
 
-    fn is_valid(&self) -> bool {
+    pub fn is_valid(&self) -> bool {
         for b in self.bytes {
             if !b.is_ascii_alphabetic() {
-                return false
+                return false;
             }
         }
 

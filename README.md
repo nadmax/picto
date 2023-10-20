@@ -5,6 +5,6 @@ Implementation of the [PNGme](https://picklenerd.github.io/pngme_book/introducti
 ## Steps
 
 - [x] Chunk Types
-- [ ] Chunks
+- [x] Chunks
 - [ ] PNG Files
 - [ ] Command Line Arguments

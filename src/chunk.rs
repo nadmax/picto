@@ -83,7 +83,7 @@ impl Display for Chunk {
 impl Chunk {
     pub const ALGORITHM: Crc<u32> = Crc::<u32>::new(&crc::CRC_32_ISO_HDLC);
 
-    fn new(chunk_type: ChunkType, data: Vec<u8>) -> Chunk {
+    pub fn new(chunk_type: ChunkType, data: Vec<u8>) -> Chunk {
         Self { chunk_type, data }
     }
 
@@ -91,7 +91,7 @@ impl Chunk {
         self.data.len() as u32
     }
 
-    fn chunk_type(&self) -> &ChunkType {
+    pub fn chunk_type(&self) -> &ChunkType {
         &self.chunk_type
     }
 
@@ -111,13 +111,13 @@ impl Chunk {
         Self::ALGORITHM.checksum(&data)
     }
 
-    fn data_as_string(&self) -> Result<String> {
+    pub fn data_as_string(&self) -> Result<String> {
         let data = str::from_utf8(&self.data).unwrap();
 
         Ok(data.to_owned())
     }
 
-    fn as_bytes(&self) -> Vec<u8> {
+    pub fn as_bytes(&self) -> Vec<u8> {
         self.length()
             .to_be_bytes()
             .iter()

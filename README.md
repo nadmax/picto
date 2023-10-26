@@ -1,10 +1,12 @@
+![check](https://github.com/nadmax/picto/actions/workflows/check.yml/badge.svg)
+
 # Picto
 
-Implementation of the [PNGme](https://picklenerd.github.io/pngme_book/introduction.html) challenge
+Implementation of the [PNGme](https://jrdngr.github.io/pngme_book/introduction.html) challenge
 
 ## Steps
 
 - [x] Chunk Types
 - [x] Chunks
-- [ ] PNG Files
+- [x] PNG Files
 - [ ] Command Line Arguments

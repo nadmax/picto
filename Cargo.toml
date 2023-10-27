@@ -5,5 +5,14 @@ edition = "2021"
 
 [dependencies]
 anyhow = "1.0.75"
+clap = { version = "4.4.7", features = ["derive"] }
 crc = "3.0.1"
 thiserror = "1.0.50"
+
+[profile.release]
+strip = true
+opt-level = "s"
+overflow-checks = false
+lto = true
+codegen-units = 1
+panic = "abort"

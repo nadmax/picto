@@ -48,13 +48,13 @@ impl TryFrom<&[u8]> for Chunk {
         }
 
         let (data, value) = value.split_at(data_length);
-        let (_crc_bytes, _) = value.split_at(4);
+        let (crc_bytes, _) = value.split_at(4);
         let new_chunk = Self {
             chunk_type,
             data: data.into(),
         };
         let current_crc = new_chunk.crc();
-        let expected_crc = u32::from_be_bytes(_crc_bytes.try_into().unwrap());
+        let expected_crc = u32::from_be_bytes(crc_bytes.try_into().unwrap());
 
         if current_crc != expected_crc {
             return Err(Error::new(ChunkError::InvalidCrc(
@@ -69,12 +69,12 @@ impl TryFrom<&[u8]> for Chunk {
 
 impl Display for Chunk {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        writeln!(f, "Chunk {{",)?;
-        writeln!(f, "  Length: {}", self.length())?;
-        writeln!(f, "  Type: {}", self.chunk_type())?;
-        writeln!(f, "  Data: {} bytes", self.data().len())?;
-        writeln!(f, "  Crc: {}", self.crc())?;
-        writeln!(f, "}}",)?;
+        writeln!(f, " Chunk {{",)?;
+        writeln!(f, "    Length: {}", self.length())?;
+        writeln!(f, "    Type: {}", self.chunk_type())?;
+        writeln!(f, "    Data: {} bytes", self.data().len())?;
+        writeln!(f, "    CRC: {}", self.crc())?;
+        write!(f, " }}",)?;
 
         Ok(())
     }
@@ -95,7 +95,7 @@ impl Chunk {
         &self.chunk_type
     }
 
-    fn data(&self) -> &[u8] {
+    pub fn data(&self) -> &[u8] {
         &self.data
     }
 

@@ -9,4 +9,4 @@ Implementation of the [PNGme](https://jrdngr.github.io/pngme_book/introduction.h
 - [x] Chunk Types
 - [x] Chunks
 - [x] PNG Files
-- [ ] Command Line Arguments
+- [x] Command Line Arguments

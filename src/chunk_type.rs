@@ -1,18 +1,29 @@
+use crate::{Error, Result};
+
 use std::convert::TryFrom;
-use std::fmt::{self, Display};
-use std::str::{from_utf8, FromStr};
+use std::fmt::{self, Display, Formatter};
+use std::str::{self, FromStr};
+use thiserror::Error;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ChunkType {
     bytes: [u8; 4],
 }
 
-impl TryFrom<[u8; 4]> for ChunkType {
-    type Error = &'static str;
+#[derive(Debug, Error)]
+enum ChunkTypeError {
+    #[error("only bytes in ASCII table are accepted")]
+    InvalidASCIIBytes,
+    #[error("only bytes representing ASCII alphabetic characters are accepted")]
+    InvalidAlphabeticBytes,
+}
 
-    fn try_from(value: [u8; 4]) -> Result<Self, Self::Error> {
+impl TryFrom<[u8; 4]> for ChunkType {
+    type Error = Error;
+
+    fn try_from(value: [u8; 4]) -> Result<Self> {
         if !value.is_ascii() {
-            return Err("ChunkType only accepts bytes in ASCII table");
+            return Err(Error::new(ChunkTypeError::InvalidASCIIBytes));
         }
 
         Ok(ChunkType { bytes: value })
@@ -20,16 +31,14 @@ impl TryFrom<[u8; 4]> for ChunkType {
 }
 
 impl FromStr for ChunkType {
-    type Err = &'static str;
+    type Err = Error;
 
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let bytes: [u8; 4] = s.as_bytes()[0..4].try_into().unwrap();
+    fn from_str(s: &str) -> Result<Self> {
+        let bytes: [u8; 4] = s.as_bytes()[0..4].try_into()?;
 
         for b in bytes {
             if !b.is_ascii_alphabetic() {
-                return Err(
-                    "ChunkType only accepts bytes representing ASCII alphabetic characters",
-                );
+                return Err(Error::new(ChunkTypeError::InvalidAlphabeticBytes));
             }
         }
 
@@ -38,8 +47,8 @@ impl FromStr for ChunkType {
 }
 
 impl Display for ChunkType {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> fmt::Result {
-        let s = from_utf8(&self.bytes).unwrap();
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        let s = str::from_utf8(&self.bytes).map_err(|_| fmt::Error)?;
 
         write!(f, "{}", s)
     }

@@ -1,3 +1,5 @@
+use std::string::FromUtf8Error;
+
 pub fn xor_encode(data: &[u8], key: &str) -> Vec<u8> {
     if key.len() == 0 {
         return data.to_vec();
@@ -13,9 +15,9 @@ pub fn xor_encode(data: &[u8], key: &str) -> Vec<u8> {
     encoded_bytes
 }
 
-pub fn xor_decode(data: &[u8], key: &str) -> String {
+pub fn xor_decode(data: &[u8], key: &str) -> Result<String, FromUtf8Error> {
     if key.len() == 0 {
-        return String::from_utf8(data.to_vec()).unwrap();
+        return String::from_utf8(data.to_vec());
     }
 
     let bytes = key.as_bytes();
@@ -25,5 +27,5 @@ pub fn xor_decode(data: &[u8], key: &str) -> String {
         decoded_bytes.push(data[i] ^ bytes[i % bytes.len()]);
     }
 
-    String::from_utf8(decoded_bytes).unwrap()
+    String::from_utf8(decoded_bytes)
 }

@@ -32,16 +32,10 @@ impl TryFrom<&[u8]> for Chunk {
         }
 
         let (data_length, value) = value.split_at(4);
-        let data_length = u32::from_be_bytes(data_length.try_into().unwrap()) as usize;
+        let data_length = u32::from_be_bytes(data_length.try_into()?) as usize;
         let (chunk_type_bytes, value) = value.split_at(4);
-        let chunk_type_bytes: [u8; 4] = chunk_type_bytes.try_into().unwrap();
-        let chunk_type = ChunkType::try_from(chunk_type_bytes);
-
-        if chunk_type.is_err() {
-            return Err(Error::new(ChunkError::InvalidChunkType));
-        }
-
-        let chunk_type = chunk_type.unwrap();
+        let chunk_type_bytes: [u8; 4] = chunk_type_bytes.try_into()?;
+        let chunk_type = ChunkType::try_from(chunk_type_bytes)?;
 
         if !chunk_type.is_valid() {
             return Err(Error::new(ChunkError::InvalidChunkType));
@@ -54,7 +48,7 @@ impl TryFrom<&[u8]> for Chunk {
             data: data.into(),
         };
         let current_crc = new_chunk.crc();
-        let expected_crc = u32::from_be_bytes(crc_bytes.try_into().unwrap());
+        let expected_crc = u32::from_be_bytes(crc_bytes.try_into()?);
 
         if current_crc != expected_crc {
             return Err(Error::new(ChunkError::InvalidCrc(
@@ -81,7 +75,7 @@ impl Display for Chunk {
 }
 
 impl Chunk {
-    pub const ALGORITHM: Crc<u32> = Crc::<u32>::new(&crc::CRC_32_ISO_HDLC);
+    pub const CRC: Crc<u32> = Crc::<u32>::new(&crc::CRC_32_ISO_HDLC);
 
     pub fn new(chunk_type: ChunkType, data: Vec<u8>) -> Chunk {
         Self { chunk_type, data }
@@ -108,13 +102,16 @@ impl Chunk {
             .copied()
             .collect();
 
-        Self::ALGORITHM.checksum(&data)
+        Self::CRC.checksum(&data)
     }
 
     pub fn data_as_string(&self) -> Result<String> {
-        let data = str::from_utf8(&self.data).unwrap();
+        let data = str::from_utf8(&self.data);
 
-        Ok(data.to_owned())
+        match data {
+            Ok(value) => Ok(value.to_owned()),
+            Err(err) => Err(Error::new(err)),
+        }
     }
 
     pub fn as_bytes(&self) -> Vec<u8> {

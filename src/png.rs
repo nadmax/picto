@@ -1,12 +1,10 @@
 use crate::chunk::Chunk;
-use crate::chunk_type::ChunkType;
 use crate::{Error, Result};
 
 use std::convert::TryFrom;
 use std::fmt::{self, Display, Formatter};
 use std::fs::read;
 use std::path::Path;
-use std::str::FromStr;
 use thiserror::Error;
 
 #[derive(Debug)]
@@ -104,7 +102,7 @@ impl Png {
         }
 
         Err(Error::new(PngError::UnknownnChunkType(
-            chunk_type.to_string(),
+            chunk_type.to_owned(),
         )))
     }
 
@@ -136,6 +134,8 @@ impl Png {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::chunk_type::ChunkType;
+    use std::str::FromStr;
 
     fn testing_chunks() -> Vec<Chunk> {
         vec![
